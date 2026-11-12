@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "Caradap.io",
+    "slug": "caradap-io",
+    "scheme": "caradap",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#FFF9F2",
+    "newArchEnabled": true,
+    "ios": { "supportsTablet": true },
+    "android": { "edgeToEdgeEnabled": true, "adaptiveIcon": { "backgroundColor": "#FF6B35" } },
+    "web": { "name": "Caradap.io — Seu mundo de sabores", "shortName": "Caradap", "bundler": "metro" },
+    "experiments": { "tsconfigPaths": true }
+  }
+}

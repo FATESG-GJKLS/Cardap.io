@@ -1,0 +1,50 @@
+CARADAP.IO — 100% LOCAL, SEM DOCKER
+==================================
+
+ANTES DE COMEÇAR:
+  - Instale Java JDK 17 ou superior
+  - Instale Maven 3.9 ou superior
+  - Instale Node.js (20.19+ ou 22+) com npm
+
+WINDOWS (JEITO MAIS FÁCIL)
+-------------------------
+1. Extraia todo o ZIP.
+2. Dê dois cliques em iniciar-api.bat (deixe aberto).
+3. Dê dois cliques em iniciar-web.bat (deixe aberto).
+4. Acesse http://localhost:8081 no navegador.
+5. Verifique a API em http://localhost:8080/api/health.
+
+WINDOWS (PELO TERMINAL, SE PREFERIR)
+------------------------------------
+Terminal 1:
+  cd api
+  mvn spring-boot:run
+
+Terminal 2 (partindo da raiz do projeto):
+  cd mobile
+  npm install
+  npm run web
+
+LINUX / MACOS
+-------------
+Terminal 1: bash iniciar-api.sh
+Terminal 2: bash iniciar-web.sh
+
+LOGIN ADMINISTRATIVO (SOMENTE PARA DEMONSTRACAO)
+------------------------------------------------
+E-mail: admin@caradap.io
+Senha: Admin@12345
+
+BANCO DE DADOS:
+- H2 relacional, salvo automaticamente em api/data/
+- Nao precisa instalar banco separado e NAO precisa de Docker.
+
+TESTES EXIGIDOS PELA N2:
+- JUnit + REST-assured: cd api && mvn test
+- Selenium: deixe API + Expo Web abertos e rode cd api && mvn test -Pe2e
+
+CELULAR FISICO:
+Crie mobile/.env com EXPO_PUBLIC_API_URL=http://IP_DO_PC:8080
+(veja o README para as instrucoes da rede local).
+
+Leia README.md para ver mais detalhes do projeto e dos testes.

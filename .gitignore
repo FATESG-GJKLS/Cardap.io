@@ -1,0 +1,16 @@
+node_modules/
+.expo/
+web-build/
+dist/
+build/
+target/
+api/data/
+*.db
+*.trace.db
+.env
+.env.local
+mobile/.env
+*.log
+.DS_Store
+.idea/
+.vscode/
