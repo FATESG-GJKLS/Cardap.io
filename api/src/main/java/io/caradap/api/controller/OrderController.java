@@ -1,49 +1,198 @@
 package io.caradap.api.controller;
 
-import io.caradap.api.dto.ApiDtos.*;
-import io.caradap.api.entity.*;
-import io.caradap.api.repo.OrderRepository;
-import io.caradap.api.repo.ProductRepository;
-import io.caradap.api.service.OrderPricingService;
-import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
-@RestController @RequestMapping("/api/orders")
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import io.caradap.api.dto.ApiDtos.OrderLineRequest;
+import io.caradap.api.dto.ApiDtos.OrderLineView;
+import io.caradap.api.dto.ApiDtos.OrderRequest;
+import io.caradap.api.dto.ApiDtos.OrderView;
+import io.caradap.api.dto.ApiDtos.StatusRequest;
+import io.caradap.api.entity.AppUser;
+import io.caradap.api.entity.CustomerOrder;
+import io.caradap.api.entity.OrderItem;
+import io.caradap.api.entity.Product;
+import io.caradap.api.repo.OrderRepository;
+import io.caradap.api.repo.ProductRepository;
+import io.caradap.api.service.OrderPricingService;
+
+@RestController
+@RequestMapping("/api/orders")
 public class OrderController {
-  private final OrderRepository orders;private final ProductRepository products;private final OrderPricingService pricing;
-  private static final Set<String> STATUSES=Set.of("RECEIVED","PREPARING","ON_THE_WAY","DELIVERED","CANCELLED");
-  public OrderController(OrderRepository orders,ProductRepository products,OrderPricingService pricing){this.orders=orders;this.products=products;this.pricing=pricing;}
-  private static OrderView view(CustomerOrder o){return new OrderView(o.id,o.customer.id,o.customer.name,o.deliveryAddress,o.paymentMethod,
-    o.notes,o.status,o.subtotal,o.deliveryFee,o.total,o.createdAt,o.items.stream()
-      .map(i->new OrderLineView(i.product.id,i.productName,i.quantity,i.unitPrice)).toList());}
-  @GetMapping public List<OrderView> all(){return orders.findAllByOrderByCreatedAtDesc().stream().map(OrderController::view).toList();}
-  @GetMapping("/mine") public List<OrderView> mine(@AuthenticationPrincipal AppUser user){return orders.findByCustomerIdOrderByCreatedAtDesc(user.id).stream().map(OrderController::view).toList();}
-  @PostMapping @ResponseStatus(HttpStatus.CREATED) @Transactional
-  public OrderView place(@AuthenticationPrincipal AppUser user,@Valid @RequestBody OrderRequest body){
-    if(body.items().size()>40) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Muitos itens no pedido");
-    CustomerOrder o=new CustomerOrder();o.customer=user;o.deliveryAddress=body.deliveryAddress().trim();o.paymentMethod=body.paymentMethod().trim();
-    o.notes=body.notes()==null?"":body.notes();BigDecimal subtotal=new BigDecimal("0.00");
-    for(OrderLineRequest line:body.items()){
-      Product product=products.findById(line.productId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Produto não encontrado"));
-      if(!product.available) throw new ResponseStatusException(HttpStatus.CONFLICT,"Produto indisponível: "+product.name);
-      OrderItem item=new OrderItem();item.order=o;item.product=product;item.productName=product.name;
-      item.quantity=line.quantity();item.unitPrice=product.price;o.items.add(item);
-      subtotal=subtotal.add(pricing.lineTotal(product.price,line.quantity()));
+
+    private static final Set<String> STATUSES = Set.of(
+        "RECEIVED",
+        "PREPARING",
+        "ON_THE_WAY",
+        "DELIVERED",
+        "CANCELLED"
+    );
+
+    private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
+    private final OrderPricingService orderPricingService;
+
+    public OrderController(
+        OrderRepository orderRepository,
+        ProductRepository productRepository,
+        OrderPricingService orderPricingService
+    ) {
+        this.orderRepository = orderRepository;
+        this.productRepository = productRepository;
+        this.orderPricingService = orderPricingService;
     }
-    o.subtotal=subtotal;o.deliveryFee=pricing.deliveryFee(subtotal);o.total=pricing.total(subtotal);
-    return view(orders.save(o));
-  }
-  @PatchMapping("/{id}/status")
-  public OrderView status(@PathVariable Long id,@Valid @RequestBody StatusRequest body){
-    if(!STATUSES.contains(body.status()))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Status desconhecido");
-    CustomerOrder o=orders.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Pedido não encontrado"));
-    o.status=body.status();return view(orders.save(o));
-  }
+
+    @GetMapping
+    public List<OrderView> findAll() {
+        return orderRepository.findAllByOrderByCreatedAtDesc()
+            .stream()
+            .map(OrderController::toView)
+            .toList();
+    }
+
+    @GetMapping("/mine")
+    public List<OrderView> findMine(@AuthenticationPrincipal AppUser user) {
+        return orderRepository.findByCustomerIdOrderByCreatedAtDesc(user.id)
+            .stream()
+            .map(OrderController::toView)
+            .toList();
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @Transactional
+    public OrderView create(
+        @AuthenticationPrincipal AppUser user,
+        @Valid @RequestBody OrderRequest request
+    ) {
+        validateItemCount(request);
+
+        CustomerOrder order = new CustomerOrder();
+        order.customer = user;
+        order.deliveryAddress = request.deliveryAddress().trim();
+        order.paymentMethod = request.paymentMethod().trim();
+        order.notes = request.notes() == null ? "" : request.notes();
+
+        BigDecimal subtotal = BigDecimal.ZERO;
+        for (OrderLineRequest lineRequest : request.items()) {
+            Product product = findProduct(lineRequest.productId());
+            validateProductAvailability(product);
+
+            OrderItem item = createOrderItem(order, product, lineRequest);
+            order.items.add(item);
+            subtotal = subtotal.add(
+                orderPricingService.lineTotal(product.price, lineRequest.quantity())
+            );
+        }
+
+        order.subtotal = subtotal;
+        order.deliveryFee = orderPricingService.deliveryFee(subtotal);
+        order.total = orderPricingService.total(subtotal);
+
+        return toView(orderRepository.save(order));
+    }
+
+    @PatchMapping("/{id}/status")
+    public OrderView updateStatus(
+        @PathVariable Long id,
+        @Valid @RequestBody StatusRequest request
+    ) {
+        if (!STATUSES.contains(request.status())) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Status desconhecido"
+            );
+        }
+
+        CustomerOrder order = orderRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Pedido não encontrado"
+            ));
+
+        order.status = request.status();
+        return toView(orderRepository.save(order));
+    }
+
+    private void validateItemCount(OrderRequest request) {
+        if (request.items().size() > 40) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Muitos itens no pedido"
+            );
+        }
+    }
+
+    private Product findProduct(Long productId) {
+        return productRepository.findById(productId)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Produto não encontrado"
+            ));
+    }
+
+    private void validateProductAvailability(Product product) {
+        if (!product.available) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Produto indisponível: " + product.name
+            );
+        }
+    }
+
+    private OrderItem createOrderItem(
+        CustomerOrder order,
+        Product product,
+        OrderLineRequest lineRequest
+    ) {
+        OrderItem item = new OrderItem();
+        item.order = order;
+        item.product = product;
+        item.productName = product.name;
+        item.quantity = lineRequest.quantity();
+        item.unitPrice = product.price;
+        return item;
+    }
+
+    private static OrderView toView(CustomerOrder order) {
+        List<OrderLineView> items = order.items.stream()
+            .map(item -> new OrderLineView(
+                item.product.id,
+                item.productName,
+                item.quantity,
+                item.unitPrice
+            ))
+            .toList();
+
+        return new OrderView(
+            order.id,
+            order.customer.id,
+            order.customer.name,
+            order.deliveryAddress,
+            order.paymentMethod,
+            order.notes,
+            order.status,
+            order.subtotal,
+            order.deliveryFee,
+            order.total,
+            order.createdAt,
+            items
+        );
+    }
 }

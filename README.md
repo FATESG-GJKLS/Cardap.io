@@ -42,6 +42,8 @@ caradap-io/
 ├── mobile/                  # Expo: App.tsx e código TypeScript
 │   ├── App.tsx
 │   ├── src/{api,demo,types}.ts
+│   ├── src/components/      # Componentes visuais reutilizáveis
+│   ├── src/screens/         # Views de autenticação, carrinho, checkout e perfil
 │   └── app.json
 ├── api/                     # Spring Boot
 │   ├── src/main/java/io/caradap/api/
