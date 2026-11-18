@@ -1259,7 +1259,7 @@ function MainApp() {
               {screen === "admin" && session?.user.role === "ADMIN" ? (
                 <>
                   <Text style={s.modalKicker}>GERENCIAMENTO</Text>
-                  <Text style={s.modalTitle}>Painel Caradap ⚙️</Text>
+                  <Text style={s.modalTitle}>Painel Caradap.io ⚙️</Text>
                   <Text style={[s.subTitle, { marginBottom: 16 }]}>
                     Produtos, categorias, usuários e pedidos num só lugar.
                   </Text>
