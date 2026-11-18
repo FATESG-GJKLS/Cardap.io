@@ -11,6 +11,9 @@ Projeto acadêmico **N2 – Testes de Software (FATESG, 2026/02)**. Aplicativo d
 - Karina Aparecida
 - Sara Alves
 
+## Video preview
+<video controls src=".docs/n2-testes-video.mp4" title="Title"></video>
+
 ## O que é
 
 O **Caradap.io** é uma loja digital de comida com um diferencial simples: **vendemos de tudo**, dos populares smash burgers, pizzas, PFs e coxinhas às receitas menos convencionais, como burger de jacaré, takoyaki e curry tailandês. As ofertas são **fictícias e demonstrativas**, para finalidade educacional.
