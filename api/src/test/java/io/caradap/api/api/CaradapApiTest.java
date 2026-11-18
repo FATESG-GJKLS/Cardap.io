@@ -32,7 +32,11 @@ class CaradapApiTest {
     }
 
     @Test
-    void shouldExposeAProductCatalogToUnauthenticatedClients() {
+    /** 
+     * Consulta o catálogo sem autenticação
+     * Espera mais de cinco produtos, incluindo o Smash da Casa.
+     */
+    void deveExporOCatalogoDeProdutosParaClientesNaoAutenticados() {
         given()
             .when()
             .get("/api/products")
@@ -43,7 +47,11 @@ class CaradapApiTest {
     }
 
     @Test
-    void shouldAllowWebClientsToPreflightPublicRequests() {
+    /**
+     * Envia uma requisição CORS de preflight
+     * Espera autorização para a origem do cliente web.
+     */
+    void devePermitirPreflightDeRequisicoesPublicasParaClientesWeb() {
         given()
             .header("Origin", "http://localhost:8081")
             .header("Access-Control-Request-Method", "POST")
@@ -56,7 +64,11 @@ class CaradapApiTest {
     }
 
     @Test
-    void shouldRejectProductCreationWithoutAdminAuthentication() {
+    /**
+     * Tenta criar um produto sem autenticação administrativa
+     * Espera o status 401.
+     */
+    void deveRejeitarCriacaoDeProdutoSemAutenticacaoAdministrativa() {
         given()
             .contentType("application/json")
             .body(Map.of("name", "Produto indevido"))
@@ -67,7 +79,11 @@ class CaradapApiTest {
     }
 
     @Test
-    void shouldRegisterACustomerAndAllowItToLogIn() {
+    /**
+     * Registra um cliente e faz login com ele
+     * Espera token, perfil CUSTOMER e o e-mail informado.
+     */
+    void deveRegistrarUmClienteEPermitirSeuLogin() {
         String email = "teste-" + System.nanoTime() + "@example.com";
         Map<String, String> credentials = Map.of(
             "email", email,
@@ -99,7 +115,11 @@ class CaradapApiTest {
     }
 
     @Test
-    void shouldRecalculateOrderPricesOnTheServer() {
+    /**
+     * Cria um pedido com preço adulterado
+     * Espera que o servidor recalcule subtotal e total corretos.
+     */
+    void deveRecalcularOsPrecosDoPedidoNoServidor() {
         String adminToken = loginAsAdmin();
         Map<String, Object> orderRequest = Map.of(
             "items", new Object[] {

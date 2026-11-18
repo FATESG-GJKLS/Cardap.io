@@ -16,14 +16,22 @@ class OrderPricingServiceTest {
     private final OrderPricingService pricingService = new OrderPricingService();
 
     @Test
-    void shouldMultiplyProductPriceByQuantity() {
+    /**
+     * Calcula o total de uma linha com três unidades
+     * Espera o preço do produto multiplicado pela quantidade.
+     */
+    void deveMultiplicarOPrecoDoProdutoPelaQuantidade() {
         BigDecimal lineTotal = pricingService.lineTotal(PRODUCT_PRICE, 3);
 
         assertEquals(EXPECTED_LINE_TOTAL, lineTotal);
     }
 
     @Test
-    void shouldOfferFreeShippingAtTheMinimumSubtotal() {
+    /**
+     * Calcula a entrega no limite e abaixo do frete grátis
+     * Espera frete zero no limite e 6,90 abaixo dele.
+     */
+    void deveOferecerFreteGratisNoSubtotalMinimo() {
         BigDecimal freeShipping = pricingService.deliveryFee(new BigDecimal("80.00"));
         BigDecimal paidShipping = pricingService.deliveryFee(new BigDecimal("79.99"));
 
@@ -32,7 +40,11 @@ class OrderPricingServiceTest {
     }
 
     @Test
-    void shouldRejectQuantitiesOutsideTheAllowedRange() {
+    /**
+     * Calcula totais com quantidades inválidas
+     * Espera IllegalArgumentException para zero e 51 unidades.
+     */
+    void deveRejeitarQuantidadesForaDoIntervaloPermitido() {
         assertThrows(
             IllegalArgumentException.class,
             () -> pricingService.lineTotal(new BigDecimal("10.00"), 0)
@@ -44,7 +56,11 @@ class OrderPricingServiceTest {
     }
 
     @Test
-    void shouldAddShippingToTheOrderTotal() {
+    /**
+     * Calcula o total de um pedido
+     * Evaspera que o frete seja somado ao subtotal.
+     */
+    void deveAdicionarOFreteAoTotalDoPedido() {
         BigDecimal total = pricingService.total(new BigDecimal("32.90"));
 
         assertEquals(new BigDecimal("39.80"), total);

@@ -33,7 +33,11 @@ class AdminCrudApiTest {
     }
 
     @Test
-    void shouldCreateReadUpdateAndDeleteACategory() {
+        /**
+         * Cria, consulta, atualiza e exclui uma categoria
+         * Espera respostas bem-sucedidas e 404 após a exclusão.
+         */
+   void deveCriarConsultarAtualizarEExcluirUmaCategoria() {
         String slug = "teste-" + System.nanoTime();
         Number categoryId = createCategory(slug);
 
@@ -49,7 +53,11 @@ class AdminCrudApiTest {
     }
 
     @Test
-    void shouldCreateReadUpdateAndDeleteAUser() {
+    /**
+     * Cria, consulta, atualiza e exclui um usuário
+     * Espera os dados atualizados e 404 após a exclusão.
+     */
+    void deveCriarConsultarAtualizarEExcluirUmUsuario() {
         String email = "crud-" + System.nanoTime() + "@example.com";
         Number userId = createUser(email);
 
@@ -65,7 +73,11 @@ class AdminCrudApiTest {
     }
 
     @Test
-    void shouldCreateReadUpdateAndDeleteAProduct() {
+    /**
+     * Cria, consulta, atualiza e exclui um produto
+     * Espera os nomes informados e 404 após a exclusão.
+     */
+    void deveCriarConsultarAtualizarEExcluirUmProduto() {
         Number productId = createProduct();
 
         getProduct(productId, 200)
