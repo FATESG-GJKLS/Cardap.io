@@ -27,7 +27,6 @@ import {
   priceCalc,
   shipping,
 } from "./src/api";
-import { sampleCategories, sampleProducts } from "./src/demo";
 import type {
   AdminSection,
   Auth,
@@ -126,8 +125,8 @@ function MainApp() {
     : desktop
       ? (contentWidth - 48) / 4
       : (contentWidth - 28) / 3;
-  const [categories, setCategories] = useState<Category[]>(sampleCategories);
-  const [products, setProducts] = useState<Product[]>(sampleProducts);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [offline, setOffline] = useState(false);
   const [categoryId, setCategoryId] = useState(0);
   const [search, setSearch] = useState("");
@@ -632,7 +631,7 @@ function MainApp() {
               <Text style={{ fontSize: 16 }}>📍</Text>
               <View>
                 <Text style={s.locKicker}>ENTREGANDO EM</Text>
-                <Text style={s.locText}>Goiânia, GO ⌄</Text>
+                <Text style={s.locText}>Goiânia, GO</Text>
               </View>
             </View>
           ) : null}
@@ -1117,24 +1116,33 @@ function MainApp() {
       <Modal
         visible={screen !== "none"}
         animationType="fade"
-        transparent
-        onRequestClose={() => setScreen("none")}
+        transparent={screen !== "admin"}
+        presentationStyle={screen === "admin" ? "fullScreen" : "overFullScreen"}
       >
         <KeyboardAvoidingView
-          style={s.modalScrim}
+          style={
+            screen === "admin"
+              ? s.adminFullScreen
+              : s.modalScrim
+          }
           behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
-          <Pressable
-            style={StyleSheet.absoluteFill}
-            onPress={() => setScreen("none")}
-          />
+          {screen !== "admin" ? (
+            <Pressable
+              style={StyleSheet.absoluteFill}
+              onPress={() => setScreen("none")}
+            />
+          ) : null}
           <View
             style={[
               s.modalSheet,
               {
-                maxWidth:
-                  screen === "admin" ? 920 : screen === "detail" ? 640 : 520,
-                maxHeight: "92%",
+                maxWidth: screen === "detail" ? 640 : screen === "admin" ? "100%" : 520,
+                maxHeight: screen === "admin" ? "100%" : "92%",
+                height: screen === "admin" ? "100%" : undefined,
+                borderRadius: screen === "admin" ? 0 : 21,
+                elevation: screen === "admin" ? 0 : 12,
+                flex: screen === "admin" ? 1 : undefined,
               },
             ]}
           >
@@ -1143,11 +1151,21 @@ function MainApp() {
                 caradap<Text style={{ color: C.orange }}>.io</Text>
               </Text>
               <Pressable
-                onPress={() => setScreen("none")}
+                onPress={() =>
+                  setScreen(screen === "admin" ? "profile" : "none")
+                }
                 accessibilityRole="button"
-                style={s.close}
+                style={screen === "admin" ? s.adminBackButton : s.close}
               >
-                <Text style={{ fontSize: 23, color: C.ink }}>×</Text>
+                <Text
+                  style={{
+                    fontSize: screen === "admin" ? 14 : 23,
+                    color: C.ink,
+                    fontWeight: screen === "admin" ? "900" : "400",
+                  }}
+                >
+                  {screen === "admin" ? "← Voltar ao perfil" : "×"}
+                </Text>
               </Pressable>
             </View>
             <ScrollView
@@ -2027,6 +2045,19 @@ const s = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 12,
     paddingVertical: 20,
+  },
+  adminFullScreen: {
+    flex: 1,
+    width: "100%",
+    backgroundColor: C.cream,
+  },
+  adminBackButton: {
+    minHeight: 34,
+    paddingHorizontal: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: C.light,
+    borderRadius: 10,
   },
   modalSheet: {
     backgroundColor: C.cream,

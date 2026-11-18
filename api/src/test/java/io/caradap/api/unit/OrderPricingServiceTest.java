@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import io.caradap.api.service.OrderPricingService;
 
 class OrderPricingServiceTest {
-
     private static final BigDecimal PRODUCT_PRICE = new BigDecimal("32.90");
     private static final BigDecimal EXPECTED_LINE_TOTAL = new BigDecimal("98.70");
 
