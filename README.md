@@ -1,8 +1,15 @@
-# 🍴 Caradap.io — Do básico ao extraordinário
+# 🍴 Caradap.io
 
 > **Aquele prato de sempre e aquele prato que você nem sabia que queria provar.**
 
-Projeto acadêmico **N2 – Testes de Software (FATESG, 2026/02)**. Aplicativo de delivery com interface original inspirada nos padrões de cardápios do MenuDino e no estilo de hamburgueria/delivery do Behest Burger. Não usa logotipos, textos ou identidade visual proprietária dessas marcas.
+Projeto acadêmico **N2 – Testes de Software (FATESG, 2026/02)**. Aplicativo de delivery com interface original inspirada nos padrões de cardápios do MenuDino e no estilo de hamburgueria/delivery do Anota.ai. Não usa logotipos, textos ou identidade visual proprietária dessas marcas.
+
+## Integrantes
+
+- Guilherme Augusto
+- Jose Roberto
+- Karina Aparecida
+- Sara Alves
 
 ## O que é
 
@@ -227,25 +234,6 @@ A pipeline em `.github/workflows/tests.yml` executa os testes em cada push/PR e 
 3. Acessar painel como admin e criar/editar/excluir um produto e uma categoria (sem produtos relacionados); mostrar gerenciamento de usuários.
 4. Abrir histórico e alterar status do pedido no painel.
 5. Mostrar saída de `mvn test` (JUnit/REST-assured) e `mvn test -Pe2e` (Selenium).
-
-## Integrantes
-
-> **Preencher antes da entrega** com o nome completo de todos os integrantes (até quatro).
-
-- [Nome completo do integrante 1]
-- [Nome completo do integrante 2]
-- [Nome completo do integrante 3]
-- [Nome completo do integrante 4]
-
-**Prazo da avaliação:** **18/11/2026, até 18h**, via GitHub público no Google Classroom; apresentação possível no mesmo dia.
-
-## Notas de produção e limitações
-
-- A confirmação de pedido não faz transações financeiras nem envia entregadores. São fluxos demonstrativos de N2.
-- Imagens vêm de URLs ilustrativas do Unsplash e requerem internet. Algumas receitas exóticas usam fotos genéricas, não fotos exatas do prato.
-- H2 é um banco relacional adequado à demonstração; para operação real, migrar para PostgreSQL, aplicar migrations (Flyway), TLS/HTTPS, logs/observabilidade, provedor de pagamentos e gestão de estoque.
-- Os dados do perfil ficam salvos no AsyncStorage. Em produção, preferir armazenamento seguro do token no dispositivo e políticas mais completas de autenticação/revogação.
-- Não foi possível instalar dependências npm/Maven nem rodar os testes neste ambiente de geração; os comandos acima e a pipeline permitem executar e validar em máquina com internet.
 
 ### Referências de estética e UX
 
