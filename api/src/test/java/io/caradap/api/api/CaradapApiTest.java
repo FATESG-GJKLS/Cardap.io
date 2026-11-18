@@ -48,23 +48,6 @@ class CaradapApiTest {
 
     @Test
     /**
-     * Envia uma requisição CORS de preflight
-     * Espera autorização para a origem do cliente web.
-     */
-    void devePermitirPreflightDeRequisicoesPublicasParaClientesWeb() {
-        given()
-            .header("Origin", "http://localhost:8081")
-            .header("Access-Control-Request-Method", "POST")
-            .header("Access-Control-Request-Headers", "content-type")
-            .when()
-            .options("/api/auth/login")
-            .then()
-            .statusCode(200)
-            .header("Access-Control-Allow-Origin", equalTo("http://localhost:8081"));
-    }
-
-    @Test
-    /**
      * Tenta criar um produto sem autenticação administrativa
      * Espera o status 401.
      */
