@@ -11,7 +11,7 @@ Projeto acadêmico **N2 – Testes de Software (FATESG, 2026/02)**. Aplicativo d
 - Karina Aparecida
 - Sara Alves
 
-## Video preview
+## Video preview (clique para assistir)
 
 [![Prévia do vídeo](https://img.youtube.com/vi/ci6c6Fis2vg/maxresdefault.jpg)](https://www.youtube.com/watch?v=ci6c6Fis2vg)
 
