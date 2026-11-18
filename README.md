@@ -12,7 +12,8 @@ Projeto acadêmico **N2 – Testes de Software (FATESG, 2026/02)**. Aplicativo d
 - Sara Alves
 
 ## Video preview
-<video controls src=".docs/n2-testes-video.mp4" title="Title"></video>
+
+[🎬 Assistir ao vídeo de demonstração](.docs/n2-testes-video.mp4)
 
 ## O que é
 
